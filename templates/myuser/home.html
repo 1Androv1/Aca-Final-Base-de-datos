@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %} Sistema académico {% endblock %}
+
+{% block body %}
+
+<section class="hero">
+	<div>
+		{% if user.is_authenticated %}
+			<h1 class="hero-title">Hola, {{ user.name }}</h1>
+			<p class="hero-text">
+				Bienvenido al sistema académico conectado a Oracle 18c XE. Desde esta pantalla puedes revisar
+				los estudiantes, cursos, matrículas y auditorías cargadas en la base de datos.
+			</p>
+			<a class="btn btn-primary" href="{% url 'user_update' %}">Actualizar mi perfil</a>
+			<a class="btn btn-danger" href="{% url 'user_logout' %}">Cerrar sesión</a>
+		{% else %}
+			<h1 class="hero-title">Sistema académico con Oracle 18c XE</h1>
+			<p class="hero-text">
+				Proyecto final de base de datos orientado a la gestión académica de estudiantes,
+				docentes, cursos, matrículas, seguridad y auditoría.
+			</p>
+
+			<div class="nav-actions">
+				<a class="btn btn-primary" href="{% url 'user_signup' %}">Crear cuenta</a>
+				<a class="btn btn-secondary" href="{% url 'user_login' %}">Iniciar sesión</a>
+			</div>
+		{% endif %}
+	</div>
+
+	<div class="hero-panel">
+		<h3>Base de datos Oracle</h3>
+		<p>
+			Incluye tablas relacionadas, índices, vistas, secuencias, procedimiento almacenado,
+			función, trigger de auditoría, usuarios, roles y política de respaldo simulada.
+		</p>
+	</div>
+</section>
+
+<section class="stats-grid">
+	<div class="stat-card">
+		<span>Estudiantes</span>
+		<strong>{{ estudiantes_count }}</strong>
+	</div>
+	<div class="stat-card">
+		<span>Docentes</span>
+		<strong>{{ docentes_count }}</strong>
+	</div>
+	<div class="stat-card">
+		<span>Cursos</span>
+		<strong>{{ cursos_count }}</strong>
+	</div>
+	<div class="stat-card">
+		<span>Matrículas</span>
+		<strong>{{ matriculas_count }}</strong>
+	</div>
+</section>
+
+<section class="section-block">
+	<h2 class="section-title">Estudiantes registrados</h2>
+	{% if estudiantes %}
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr>
+						<th>Documento</th>
+						<th>Nombre</th>
+						<th>Correo</th>
+						<th>Teléfono</th>
+						<th>Estado</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for estudiante in estudiantes %}
+						<tr>
+							<td>{{ estudiante.documento }}</td>
+							<td>{{ estudiante.nombres }} {{ estudiante.apellidos }}</td>
+							<td>{{ estudiante.correo }}</td>
+							<td>{{ estudiante.telefono }}</td>
+							<td>{{ estudiante.estado }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div class="empty-state">
+			<p>No hay estudiantes registrados.</p>
+		</div>
+	{% endif %}
+</section>
+
+<section class="section-block">
+	<h2 class="section-title">Cursos disponibles</h2>
+	{% if cursos %}
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr>
+						<th>Código</th>
+						<th>Curso</th>
+						<th>Créditos</th>
+						<th>Cupo</th>
+						<th>Docente</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for curso in cursos %}
+						<tr>
+							<td>{{ curso.codigo }}</td>
+							<td>{{ curso.nombre }}</td>
+							<td>{{ curso.creditos }}</td>
+							<td>{{ curso.cupo_maximo }}</td>
+							<td>{{ curso.docente.nombres }} {{ curso.docente.apellidos }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div class="empty-state">
+			<p>No hay cursos registrados.</p>
+		</div>
+	{% endif %}
+</section>
+
+<section class="section-block">
+	<h2 class="section-title">Matrículas recientes</h2>
+	{% if matriculas %}
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr>
+						<th>Estudiante</th>
+						<th>Curso</th>
+						<th>Fecha</th>
+						<th>Nota</th>
+						<th>Estado</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for matricula in matriculas %}
+						<tr>
+							<td>{{ matricula.estudiante.nombres }} {{ matricula.estudiante.apellidos }}</td>
+							<td>{{ matricula.curso.nombre }}</td>
+							<td>{{ matricula.fecha_matricula|date:'d/m/Y H:i' }}</td>
+							<td>{% if matricula.nota_final %}{{ matricula.nota_final }}{% else %}Pendiente{% endif %}</td>
+							<td>{{ matricula.estado }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% else %}
+		<div class="empty-state">
+			<p>No hay matrículas registradas.</p>
+		</div>
+	{% endif %}
+</section>
+
+<section class="section-block">
+	<h2 class="section-title">Usuarios de la aplicación</h2>
+
+	{% if all_users %}
+		<div class="user-grid">
+			{% for listed_user in all_users %}
+				<div class="user-card">
+					<div class="user-avatar">
+						{{ listed_user.name|first|upper }}
+					</div>
+
+					<h4>{{ listed_user.name }}</h4>
+					<p><strong>Correo:</strong> {{ listed_user.email }}</p>
+					<p><strong>Rol:</strong> {% if listed_user.is_admin %}Administrador{% else %}Usuario{% endif %}</p>
+
+					{% if user.is_authenticated and user.is_admin %}
+						<form method="post" action="{% url 'user_delete' listed_user.id %}">
+							{% csrf_token %}
+							<button class="btn btn-danger" type="submit">Eliminar usuario</button>
+						</form>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="empty-state">
+			<p>No hay usuarios registrados en el sistema.</p>
+		</div>
+	{% endif %}
+</section>
+
+{% endblock %}

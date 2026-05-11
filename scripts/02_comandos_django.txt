@@ -1,0 +1,42 @@
+PASOS PARA EJECUTAR EL PROYECTO DJANGO CON ORACLE 18c XE
+=========================================================
+
+1. Instalar dependencias:
+
+   pip install -r requirements.txt
+
+2. Crear la base de datos académica en Oracle.
+   Conectarse como SYS en XEPDB1:
+
+   sqlplus sys/Oracle123@//localhost:1521/XEPDB1 as sysdba
+
+   Luego ejecutar:
+
+   @scripts/01_crear_base_oracle_academico.sql
+
+3. Configurar variables de entorno para Django, si quieres usar las credenciales por defecto no es obligatorio:
+
+   set ORACLE_SERVICE_NAME=localhost:1521/XEPDB1
+   set ORACLE_USER=SISTEMA_ACADEMICO_APP
+   set ORACLE_PASSWORD=Academico123
+
+4. Crear tablas internas de Django:
+
+   python manage.py migrate
+
+5. Crear superusuario de Django:
+
+   python manage.py createsuperuser
+
+6. Ejecutar el servidor:
+
+   python manage.py runserver
+
+7. Abrir en el navegador:
+
+   http://127.0.0.1:8000/
+
+IMPORTANTE:
+- SYS/Oracle123 se usa solamente para ejecutar el script de creación.
+- La aplicación Django se conecta con SISTEMA_ACADEMICO_APP/Academico123.
+- El usuario restringido para evidenciar seguridad es SISTEMA_ACADEMICO_CONSULTA/Consulta123.

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %} Iniciar sesión {% endblock %}
+
+{% block body %}
+
+<div class="card auth-card">
+	<h2 class="page-title">Iniciar sesión</h2>
+	<p class="page-subtitle">
+		Ingresa tus credenciales para acceder al sistema.
+	</p>
+
+	{% if error %}
+		<p style="color: #b00020; font-weight: 600;">{{ error }}</p>
+	{% endif %}
+
+	<form method="post">
+		{% csrf_token %}
+
+		<div class="form-group">
+			<label for="email">Correo electrónico</label>
+			<input class="form-control" type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
+		</div>
+
+		<div class="form-group">
+			<label for="password">Contraseña</label>
+			<input class="form-control" type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+		</div>
+
+		<button class="btn btn-primary btn-block" type="submit">Ingresar</button>
+	</form>
+
+	<div class="auth-footer">
+		¿No tienes una cuenta?
+		<a href="{% url 'user_signup' %}">Regístrate aquí</a>
+	</div>
+</div>
+
+{% endblock %}

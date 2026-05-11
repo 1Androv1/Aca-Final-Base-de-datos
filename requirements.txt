@@ -1,0 +1,5 @@
+Django==5.2.3
+oracledb==4.0.0
+pytest==8.3.5
+pytest-django==4.10.0
+pytest-cov==6.1.1
